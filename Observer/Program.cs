@@ -1,4 +1,5 @@
 ﻿using Observer.Observer;
+using Observer.Observer4;
 using System.Reactive.Linq;
 namespace Observer
 {
@@ -43,26 +44,62 @@ namespace Observer
 
             //Console.WriteLine($"Window alive? {windowRef.IsAlive}");
 
-            var person = new Observer3.Person 
+            //var person = new Observer3.Person 
+            //{
+            //    Age = 15
+            //};
+            //person.Citizen = true;
+            //person.PropertyChanged += Person_PropertyChanged;
+            //Console.WriteLine("Changing age:");
+            //person.Age++;
+            //Console.WriteLine("Changing citizenship");
+            //person.Citizen = false;
+
+            var product = new Product
             {
-                Age = 15
+                Name = "Book"
             };
-            person.Citizen = true;
-            person.PropertyChanged += Person_PropertyChanged;
-            Console.WriteLine("Changing age:");
-            person.Age++;
-            Console.WriteLine("Changing citizenship");
-            person.Citizen = false;
+
+            var window = new Observer4.Window
+            {
+                ProductName = "Book"
+            };
+
+            //Синхронизация двух полей в разных объектах классах
+            //product.PropertyChanged += (sender, e) =>
+            //{
+            //    if(e.PropertyName == "Name")
+            //    {
+            //        Console.WriteLine("Name change in product");
+            //        window.ProductName = product.Name;
+            //    }
+            //};
+
+            //window.PropertyChanged += (sender, e) =>
+            //{
+            //    if (e.PropertyName == "ProductName")
+            //    {
+            //        Console.WriteLine("Name change in window");
+            //        product.Name = window.ProductName;
+            //    }
+            //};
+
+            using var binding = new BidirectionalBinding(product, () => product.Name, window, () => window.ProductName);
+            product.Name = "Table";
+            Console.WriteLine(product);
+            Console.WriteLine(window);
+
+
         }
 
-        private static void Person_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            var p = (Observer3.Person)sender;
-            if(e.PropertyName == "CanVote")
-            {
-                Console.WriteLine($"Voting status changed {p.Age}");
-            }
-        }
+        //private static void Person_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        //{
+        //    var p = (Observer3.Person)sender;
+        //    if(e.PropertyName == "CanVote")
+        //    {
+        //        Console.WriteLine($"Voting status changed {p.Age}");
+        //    }
+        //}
 
         //public void OnCompleted()
         //{
