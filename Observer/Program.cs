@@ -1,6 +1,5 @@
-﻿using Observer.Observer;
-using Observer.Observer4;
-using System.Reactive.Linq;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Observer.Observer5;
 namespace Observer
 {
     internal class Program /*: IObserver<Observer.Event>*/
@@ -55,15 +54,15 @@ namespace Observer
             //Console.WriteLine("Changing citizenship");
             //person.Citizen = false;
 
-            var product = new Product
-            {
-                Name = "Book"
-            };
+            //var product = new Product
+            //{
+            //    Name = "Book"
+            //};
 
-            var window = new Observer4.Window
-            {
-                ProductName = "Book"
-            };
+            //var window = new Observer4.Window
+            //{
+            //    ProductName = "Book"
+            //};
 
             //Синхронизация двух полей в разных объектах классах
             //product.PropertyChanged += (sender, e) =>
@@ -84,12 +83,33 @@ namespace Observer
             //    }
             //};
 
-            using var binding = new BidirectionalBinding(product, () => product.Name, window, () => window.ProductName);
-            product.Name = "Table";
-            Console.WriteLine(product);
-            Console.WriteLine(window);
+            //using var binding = new BidirectionalBinding(product, () => product.Name, window, () => window.ProductName);
+            //product.Name = "Table";
+            //Console.WriteLine(product);
+            //Console.WriteLine(window);
 
+            var services = new ServiceCollection();
+            ConfigureServices(services);
 
+            var serviceProvider = services.BuildServiceProvider();
+
+            // Подписываем обработчики на отправители событий
+            EventSubscriptionManager.SubscribeAll(serviceProvider);
+
+            // Использование
+            var button = serviceProvider.GetRequiredService<Observer5.Button>();
+            button.Fire(1); // Должно вызвать обработчик в Logging и вывести сообщение в консоль
+            button.Fire(2); // Аналогично, для второго нажатия
+
+        }
+
+        static void ConfigureServices(IServiceCollection services)
+        {
+            services.AddSingleton<Observer5.Button>();
+            services.AddSingleton<Observer5.Logging>();
+
+            services.AddSingleton<ISend<Observer5.ButtonPressedEvent>>(provider => provider.GetRequiredService<Observer5.Button>());
+            services.AddSingleton<IHandle<Observer5.ButtonPressedEvent>>(provider => provider.GetRequiredService<Observer5.Logging>());
         }
 
         //private static void Person_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
