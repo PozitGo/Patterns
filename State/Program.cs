@@ -1,4 +1,5 @@
 ﻿
+using State.Stateless;
 using System.Formats.Asn1;
 
 namespace State
@@ -12,7 +13,15 @@ namespace State
             //ls.Off();
             //ls.Off();
             //TestManualStateMachine();
-            Switches.Switches.Execute();
+            //Switches.Switches.Execute();
+            //StateStateless.Execute();
+
+            var cl = new CombinationLock(new int[] { 1, 2, 3, 4, 5 });
+            cl.EnterDigit(1);
+            cl.EnterDigit(2);
+            cl.EnterDigit(3);
+            cl.EnterDigit(4);
+            cl.EnterDigit(5);
 
 
         }
